@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Формула-мастер | ЕГЭ и школа + Админ‑панель</title>
+    <title>Формула-мастер | ЕГЭ и школа + Общая статистика Firebase</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <style>
         * {
             margin: 0;
@@ -166,6 +170,11 @@
             background: #8b5cf6;
         }
 
+        .global-history-btn {
+            margin-top: 0.5rem;
+            background: #10b981;
+        }
+
         .progress-section {
             margin: 1.5rem 0;
         }
@@ -316,7 +325,7 @@
             display: none;
         }
 
-        /* Модальное окно админа */
+        /* Модальные окна */
         .modal {
             display: none;
             position: fixed;
@@ -333,7 +342,7 @@
             background: var(--surface);
             border-radius: 1.5rem;
             padding: 2rem;
-            max-width: 800px;
+            max-width: 900px;
             width: 90%;
             max-height: 80vh;
             overflow-y: auto;
@@ -361,6 +370,21 @@
             background: var(--danger);
             margin-top: 1rem;
         }
+        .history-card {
+            background: var(--option-bg);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+        }
+        .badge {
+            display: inline-block;
+            background: var(--accent);
+            border-radius: 2rem;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.7rem;
+            margin-right: 0.5rem;
+        }
 
         @media (max-width: 800px) {
             .sidebar {
@@ -374,22 +398,13 @@
                 font-size: 1.3rem;
             }
         }
-
-        .badge {
-            display: inline-block;
-            background: var(--accent);
-            border-radius: 2rem;
-            padding: 0.2rem 0.8rem;
-            font-size: 0.7rem;
-            margin-right: 0.5rem;
-        }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
         <h1>📐 Формула-мастер | ЕГЭ и школа</h1>
-        <p class="sub">🧠 Более 230 формул: физика, алгебра, геометрия. Подготовка к ЕГЭ (профиль/база) и олимпиадам.</p>
+        <p class="sub">🧠 Более 230 формул: физика, алгебра, геометрия. Статистика всех пользователей сохраняется в облаке.</p>
     </div>
     <div class="dashboard">
         <div class="sidebar">
@@ -419,7 +434,8 @@
             <div class="control-group">
                 <button id="startBtn">🎯 Начать тренировку</button>
                 <button id="themeBtn" class="theme-toggle">🌓 Тёмная/Светлая тема</button>
-                <button id="adminBtn" class="admin-btn">🔐 Админ панель</button>
+                <button id="adminBtn" class="admin-btn">🔐 Админ панель (локальная)</button>
+                <button id="globalHistoryBtn" class="global-history-btn">🌍 История всех тренировок</button>
             </div>
             <div class="progress-section" id="progressSection" style="display: none;">
                 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
@@ -475,18 +491,48 @@
     </div>
 </div>
 
-<!-- Модальное окно админ-панели -->
+<!-- Модальное окно админ-панели (локальная статистика) -->
 <div id="adminModal" class="modal">
     <div class="modal-content">
-        <h2>👑 Админ-панель</h2>
+        <h2>👑 Админ-панель (локальная статистика)</h2>
         <div id="adminStats"></div>
         <button id="resetStatsBtn" class="reset-stats">🗑 Сбросить всю статистику</button>
         <button id="closeAdminBtn" style="margin-top: 1rem; background: #475569;">Закрыть</button>
     </div>
 </div>
 
+<!-- Модальное окно глобальной истории (Firebase) -->
+<div id="globalHistoryModal" class="modal">
+    <div class="modal-content">
+        <h2>🌍 Статистика всех пользователей (Firebase)</h2>
+        <div id="globalHistoryStats"></div>
+        <button id="closeGlobalHistoryBtn" style="margin-top: 1rem; background: #475569;">Закрыть</button>
+    </div>
+</div>
+
 <script>
-    // ===================== ПОЛНАЯ БАЗА ФОРМУЛ (исправленная, без синтаксических ошибок) =====================
+    // ===================== FIREBASE КОНФИГ (ВАШ) =====================
+    const firebaseConfig = {
+        apiKey: "AIzaSyBWiv9cL1eGrVaq5G5dL-d4HBqCFtYJZuw",
+        authDomain: "eosdrankre.firebaseapp.com",
+        projectId: "eosdrankre",
+        storageBucket: "eosdrankre.firebasestorage.app",
+        messagingSenderId: "541502726472",
+        appId: "1:541502726472:web:15ba3aeecfcb93df92137d",
+        measurementId: "G-QZGX37SNLK"
+    };
+
+    // Инициализация Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    // Анонимная авторизация (каждый пользователь получает уникальный ID)
+    auth.signInAnonymously().catch(error => console.error("Ошибка анонимного входа:", error));
+    let currentUserId = null;
+    auth.onAuthStateChanged(user => { if (user) currentUserId = user.uid; });
+
+    // ===================== ПОЛНАЯ БАЗА ФОРМУЛ =====================
     const formulasDB = [
         // ----- ФИЗИКА -----
         { subject: 'physics', class: 7, difficulty: 'easy', formula: 'v = s / t', name: 'Формула скорости', description: 'Скорость = путь / время' },
@@ -679,68 +725,31 @@
     }
     const fullFormulas = uniqueFormulas;
 
-    // ===================== СИСТЕМА СТАТИСТИКИ =====================
-    // Ключ для localStorage
+    // ===================== ЛОКАЛЬНАЯ СТАТИСТИКА (как была) =====================
     const STATS_KEY = 'formula_trainer_stats';
-    
-    // Инициализация статистики
     function initStats() {
-        const defaultStats = {
-            hintClicks: 0,                       // общее количество нажатий на подсказку
-            classDifficultyStats: {}             // структура: { "7_easy": { total:0, correct:0 }, ... }
-        };
+        const defaultStats = { hintClicks: 0, classDifficultyStats: {} };
         const saved = localStorage.getItem(STATS_KEY);
         if (saved) {
-            try {
-                return JSON.parse(saved);
-            } catch(e) { return defaultStats; }
+            try { return JSON.parse(saved); } catch(e) { return defaultStats; }
         }
         return defaultStats;
     }
-    
     let stats = initStats();
-    
-    // Сохранить статистику
-    function saveStats() {
-        localStorage.setItem(STATS_KEY, JSON.stringify(stats));
-    }
-    
-    // Обновление статистики по ответу (класс, сложность, правильно/неправильно)
+    function saveStats() { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); }
     function updateStatsForAnswer(classNum, difficulty, isCorrect) {
         const key = `${classNum}_${difficulty}`;
-        if (!stats.classDifficultyStats[key]) {
-            stats.classDifficultyStats[key] = { total: 0, correct: 0 };
-        }
+        if (!stats.classDifficultyStats[key]) stats.classDifficultyStats[key] = { total: 0, correct: 0 };
         stats.classDifficultyStats[key].total += 1;
-        if (isCorrect) {
-            stats.classDifficultyStats[key].correct += 1;
-        }
+        if (isCorrect) stats.classDifficultyStats[key].correct += 1;
         saveStats();
     }
-    
-    // Обновление статистики подсказок
-    function updateHintStats() {
-        stats.hintClicks += 1;
-        saveStats();
-    }
-    
-    // Сброс статистики
-    function resetStats() {
-        stats = { hintClicks: 0, classDifficultyStats: {} };
-        saveStats();
-        if (adminModal.style.display === 'flex') {
-            renderAdminStats();
-        }
-    }
-    
-    // Отображение статистики в админ-панели
+    function updateHintStats() { stats.hintClicks += 1; saveStats(); }
+    function resetStats() { stats = { hintClicks: 0, classDifficultyStats: {} }; saveStats(); if (adminModal.style.display === 'flex') renderAdminStats(); }
     function renderAdminStats() {
         const container = document.getElementById('adminStats');
         if (!container) return;
-        let html = `<p><strong>🔔 Всего нажатий на подсказку:</strong> ${stats.hintClicks}</p>`;
-        html += `<h3>📊 Статистика по классам и сложности</h3>`;
-        html += `<table class="stats-table"><thead><tr><th>Класс / Сложность</th><th>Всего вопросов</th><th>Правильных</th><th>% правильных</th></tr></thead><tbody>`;
-        
+        let html = `<p><strong>🔔 Всего нажатий на подсказку:</strong> ${stats.hintClicks}</p><h3>📊 Статистика по классам и сложности</h3><table class="stats-table"><thead><tr><th>Класс / Сложность</th><th>Всего вопросов</th><th>Правильных</th><th>% правильных</th></tr></thead><tbody>`;
         const classes = [7,8,9,10,11];
         const difficulties = ['easy', 'medium', 'hard'];
         let anyData = false;
@@ -751,56 +760,25 @@
                 if (stat && stat.total > 0) {
                     anyData = true;
                     const percent = ((stat.correct / stat.total) * 100).toFixed(1);
-                    html += `<tr><td>${cls} класс / ${diff === 'easy' ? 'легкий' : diff === 'medium' ? 'средний' : 'сложный'}</td>
-                             <td>${stat.total}</td><td>${stat.correct}</td><td>${percent}%</td></tr>`;
+                    html += `<tr><td>${cls} класс / ${diff === 'easy' ? 'легкий' : diff === 'medium' ? 'средний' : 'сложный'}</td><td>${stat.total}</td><td>${stat.correct}</td><td>${percent}%</td></tr>`;
                 }
             }
         }
-        if (!anyData) {
-            html += `<tr><td colspan="4">Нет данных. Пройдите несколько тренировок.</td></tr>`;
-        }
+        if (!anyData) html += `<tr><td colspan="4">Нет данных. Пройдите несколько тренировок.</td></tr>`;
         html += `</tbody></table>`;
         container.innerHTML = html;
     }
-    
-    // Модальное окно админа
-    const adminModal = document.getElementById('adminModal');
-    const adminBtn = document.getElementById('adminBtn');
-    const closeAdminBtn = document.getElementById('closeAdminBtn');
-    const resetStatsBtn = document.getElementById('resetStatsBtn');
-    
-    function openAdminModal() {
-        const password = prompt("Введите пароль администратора:");
-        if (password === "EOSDBYKRE") {
-            renderAdminStats();
-            adminModal.style.display = 'flex';
-        } else if (password !== null) {
-            alert("Неверный пароль!");
-        }
-    }
-    
-    adminBtn.addEventListener('click', openAdminModal);
-    closeAdminBtn.addEventListener('click', () => {
-        adminModal.style.display = 'none';
-    });
-    resetStatsBtn.addEventListener('click', () => {
-        if (confirm("Вы уверены, что хотите сбросить всю статистику?")) {
-            resetStats();
-            alert("Статистика сброшена.");
-        }
-    });
-    window.addEventListener('click', (e) => {
-        if (e.target === adminModal) adminModal.style.display = 'none';
-    });
-    
-    // ===================== ОСНОВНАЯ ЛОГИКА ТРЕНАЖЁРА =====================
+
+    // ===================== ОСНОВНАЯ ЛОГИКА ТРЕНАЖЁРА (с добавлением Firebase) =====================
     let activeQuestions = [];
     let currentIndex = 0;
     let userAnswers = [];
     let answerLock = false;
-    let currentSessionClass = null;   // запоминаем класс и сложность текущей сессии для статистики
+    let currentSessionClass = null;
     let currentSessionDifficulty = null;
-    
+    let currentSessionSubject = null;
+    let currentSessionHints = 0;   // подсказки за текущую сессию
+
     // DOM элементы
     const classSelect = document.getElementById('classSelect');
     const subjectSelect = document.getElementById('subjectSelect');
@@ -824,7 +802,7 @@
     const restartBtn = document.getElementById('restartBtn');
     const newConfigBtn = document.getElementById('newConfigBtn');
     const progressSection = document.getElementById('progressSection');
-    
+
     function shuffleArray(arr) {
         for (let i = arr.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -832,7 +810,7 @@
         }
         return arr;
     }
-    
+
     function getSmartWrongOptions(correctFormula, count = 3) {
         const candidates = fullFormulas.filter(f => 
             f.subject === correctFormula.subject && 
@@ -855,7 +833,7 @@
         const shuffled = shuffleArray(unique);
         return shuffled.slice(0, count).map(f => f.name);
     }
-    
+
     function loadQuiz() {
         const selectedClass = parseInt(classSelect.value);
         const selectedSubject = subjectSelect.value;
@@ -863,6 +841,8 @@
         
         currentSessionClass = selectedClass;
         currentSessionDifficulty = selectedDifficulty;
+        currentSessionSubject = selectedSubject;
+        currentSessionHints = 0;   // обнуляем счётчик подсказок для новой сессии
         
         let filtered = fullFormulas.filter(f => 
             f.class === selectedClass &&
@@ -882,7 +862,7 @@
         updateProgressUI();
         return true;
     }
-    
+
     function updateProgressUI() {
         totalQSpan.textContent = activeQuestions.length;
         currentIdxSpan.textContent = currentIndex + 1;
@@ -891,7 +871,7 @@
         const percent = (currentIndex / activeQuestions.length) * 100;
         progressFill.style.width = `${percent}%`;
     }
-    
+
     function renderCurrentQuestion() {
         if (currentIndex >= activeQuestions.length) {
             finishQuiz();
@@ -925,7 +905,7 @@
             btn.classList.remove('correct', 'incorrect', 'disabled');
         });
     }
-    
+
     function handleAnswer(selected, correctName, formulaObj) {
         if (answerLock) return;
         answerLock = true;
@@ -938,11 +918,10 @@
             description: formulaObj.description,
             subject: formulaObj.subject
         };
-        // Запись в статистику (если есть класс и сложность сессии)
+        // Запись в локальную статистику
         if (currentSessionClass && currentSessionDifficulty && currentSessionDifficulty !== 'all') {
             updateStatsForAnswer(currentSessionClass, currentSessionDifficulty, isCorrect);
         } else if (currentSessionClass && currentSessionDifficulty === 'all') {
-            // если выбран "все уровни", то используем сложность самой формулы
             updateStatsForAnswer(currentSessionClass, formulaObj.difficulty, isCorrect);
         }
         
@@ -960,7 +939,7 @@
         correctSpan.textContent = correctCount;
         nextBtn.disabled = false;
     }
-    
+
     function nextQuestion() {
         if (nextBtn.disabled) return;
         if (currentIndex + 1 <= activeQuestions.length) {
@@ -975,7 +954,7 @@
             finishQuiz();
         }
     }
-    
+
     function skipQuestion() {
         if (answerLock) return;
         const q = activeQuestions[currentIndex];
@@ -987,7 +966,7 @@
             description: q.description,
             subject: q.subject
         };
-        // Учитываем пропуск как неправильный ответ в статистике
+        // Учитываем пропуск как неправильный ответ в локальной статистике
         if (currentSessionClass && currentSessionDifficulty && currentSessionDifficulty !== 'all') {
             updateStatsForAnswer(currentSessionClass, currentSessionDifficulty, false);
         } else if (currentSessionClass && currentSessionDifficulty === 'all') {
@@ -1005,16 +984,48 @@
         const correctCount = userAnswers.filter(a => a && a.isCorrect).length;
         correctSpan.textContent = correctCount;
     }
-    
+
     function showHint() {
         if (answerLock) return;
         const q = activeQuestions[currentIndex];
         const hintText = `🔍 Подсказка: это формула из раздела ${q.subject === 'physics' ? 'Физики' : q.subject === 'algebra' ? 'Алгебры' : 'Геометрии'}. Начинается на букву «${q.name[0]}».`;
         alert(hintText);
-        updateHintStats();  // запись статистики подсказки
+        updateHintStats();          // локальная статистика
+        currentSessionHints++;      // считаем подсказки для Firebase
     }
-    
-    function finishQuiz() {
+
+    // Функция сохранения сессии в Firebase
+    async function saveSessionToFirebase(total, correct) {
+        if (!currentUserId) {
+            console.warn("Пользователь не авторизован, сессия не сохранена");
+            return;
+        }
+        // Определяем предмет (если выбран конкретный, иначе 'all')
+        let subject = currentSessionSubject;
+        if (subject === 'all') {
+            // Если выбраны все предметы, можно указать 'all' или вывести статистику по каждому, но для простоты сохраним как 'all'
+            subject = 'all';
+        }
+        const sessionData = {
+            userId: currentUserId,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            class: currentSessionClass,
+            subject: subject,
+            difficulty: currentSessionDifficulty === 'all' ? 'all' : currentSessionDifficulty,
+            totalQuestions: total,
+            correctAnswers: correct,
+            hintsUsed: currentSessionHints,
+            percentCorrect: Math.round((correct / total) * 100)
+        };
+        try {
+            await db.collection('sessions').add(sessionData);
+            console.log("Сессия сохранена в Firebase");
+        } catch (error) {
+            console.error("Ошибка сохранения сессии в Firebase:", error);
+        }
+    }
+
+    async function finishQuiz() {
         quizArea.classList.add('hidden');
         resultArea.classList.remove('hidden');
         welcomeArea.classList.add('hidden');
@@ -1043,8 +1054,11 @@
             triggerConfetti();
         }
         progressSection.style.display = 'none';
+        
+        // Сохраняем сессию в Firebase
+        await saveSessionToFirebase(total, correctCount);
     }
-    
+
     function triggerConfetti() {
         import('https://cdn.skypack.dev/canvas-confetti').then(module => {
             module.default({
@@ -1056,7 +1070,7 @@
             });
         }).catch(() => console.log("🎉 Поздравляем!"));
     }
-    
+
     function startTraining() {
         if (!loadQuiz()) return;
         welcomeArea.classList.add('hidden');
@@ -1069,12 +1083,112 @@
         updateProgressUI();
         nextBtn.disabled = true;
     }
-    
+
     function toggleTheme() {
         document.body.classList.toggle('light');
         localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark');
     }
+
+    // ===================== ГЛОБАЛЬНАЯ ИСТОРИЯ (Firebase) =====================
+    const globalHistoryModal = document.getElementById('globalHistoryModal');
+    const globalHistoryStats = document.getElementById('globalHistoryStats');
+    const closeGlobalHistoryBtn = document.getElementById('closeGlobalHistoryBtn');
+    const globalHistoryBtn = document.getElementById('globalHistoryBtn');
+
+    async function loadGlobalHistory() {
+        globalHistoryStats.innerHTML = '<p>Загрузка данных из Firebase...</p>';
+        try {
+            const snapshot = await db.collection('sessions').orderBy('timestamp', 'desc').limit(200).get();
+            const sessions = snapshot.docs.map(doc => doc.data());
+            if (sessions.length === 0) {
+                globalHistoryStats.innerHTML = '<p>Пока нет ни одной тренировки. Пройдите тест, чтобы данные появились.</p>';
+                return;
+            }
+            // Сводная статистика
+            let totalSessions = sessions.length, totalHints = 0, totalCorrect = 0, totalQuestions = 0;
+            const classStats = {}, subjectStats = {};
+            sessions.forEach(s => {
+                totalHints += s.hintsUsed || 0;
+                totalCorrect += s.correctAnswers;
+                totalQuestions += s.totalQuestions;
+                const cls = s.class;
+                const subj = s.subject;
+                if (!classStats[cls]) classStats[cls] = { correct: 0, total: 0 };
+                classStats[cls].correct += s.correctAnswers;
+                classStats[cls].total += s.totalQuestions;
+                if (!subjectStats[subj]) subjectStats[subj] = { correct: 0, total: 0 };
+                subjectStats[subj].correct += s.correctAnswers;
+                subjectStats[subj].total += s.totalQuestions;
+            });
+            let html = `<div style="background:rgba(59,130,246,0.2); padding:1rem; border-radius:1rem; margin-bottom:1rem;">
+                <strong>📊 Всего тренировок:</strong> ${totalSessions}<br>
+                <strong>💡 Всего подсказок:</strong> ${totalHints}<br>
+                <strong>✅ Общая точность:</strong> ${totalQuestions ? ((totalCorrect/totalQuestions)*100).toFixed(1) : 0}% (${totalCorrect}/${totalQuestions})
+            </div>`;
+            html += `<h3>По классам</h3><table class="stats-table"><thead><tr><th>Класс</th><th>Правильно</th><th>Всего</th><th>%</th></tr></thead><tbody>`;
+            for (let [cls, data] of Object.entries(classStats)) {
+                html += `<tr><td>${cls}</td><td>${data.correct}</td><td>${data.total}</td><td>${((data.correct/data.total)*100).toFixed(1)}%</td></tr>`;
+            }
+            html += `</tbody></table><h3>По предметам</h3><table class="stats-table"><thead><tr><th>Предмет</th><th>Правильно</th><th>Всего</th><th>%</th></tr></thead><tbody>`;
+            for (let [subj, data] of Object.entries(subjectStats)) {
+                let name = { physics:'Физика', algebra:'Алгебра', geometry:'Геометрия', all:'Все предметы' }[subj] || subj;
+                html += `<tr><td>${name}</td><td>${data.correct}</td><td>${data.total}</td><td>${((data.correct/data.total)*100).toFixed(1)}%</td></tr>`;
+            }
+            html += `</tbody></table><h3>Последние тренировки</h3><div style="max-height:300px; overflow-y:auto;">`;
+            sessions.slice(0, 20).forEach(s => {
+                let date = s.timestamp ? new Date(s.timestamp.toDate()).toLocaleString() : 'неизвестно';
+                let subjName = { physics:'Физика', algebra:'Алгебра', geometry:'Геометрия', all:'Все предметы' }[s.subject] || s.subject;
+                html += `<div class="history-card"><div><strong>📅 ${date}</strong> — ${s.class} класс, ${subjName}, ${s.difficulty === 'all' ? 'все уровни' : (s.difficulty === 'easy' ? 'легкий' : s.difficulty === 'medium' ? 'средний' : 'сложный')}</div>
+                ✅ ${s.correctAnswers}/${s.totalQuestions} (${s.percentCorrect}%) · 💡 подсказок: ${s.hintsUsed || 0}</div>`;
+            });
+            html += `</div>`;
+            globalHistoryStats.innerHTML = html;
+        } catch (error) {
+            console.error("Ошибка загрузки глобальной истории:", error);
+            globalHistoryStats.innerHTML = `<p>Ошибка загрузки данных. Убедитесь, что Firebase настроен правильно и в консоли включена анонимная аутентификация.</p>`;
+        }
+    }
+
+    globalHistoryBtn.addEventListener('click', () => {
+        globalHistoryModal.style.display = 'flex';
+        loadGlobalHistory();
+    });
+    closeGlobalHistoryBtn.addEventListener('click', () => {
+        globalHistoryModal.style.display = 'none';
+    });
+    window.addEventListener('click', (e) => {
+        if (e.target === globalHistoryModal) globalHistoryModal.style.display = 'none';
+    });
+
+    // ===================== АДМИН-ПАНЕЛЬ (локальная) =====================
+    const adminModal = document.getElementById('adminModal');
+    const adminBtn = document.getElementById('adminBtn');
+    const closeAdminBtn = document.getElementById('closeAdminBtn');
+    const resetStatsBtn = document.getElementById('resetStatsBtn');
     
+    function openAdminModal() {
+        const password = prompt("Введите пароль администратора:");
+        if (password === "EOSDBYKRE") {
+            renderAdminStats();
+            adminModal.style.display = 'flex';
+        } else if (password !== null) {
+            alert("Неверный пароль!");
+        }
+    }
+    
+    adminBtn.addEventListener('click', openAdminModal);
+    closeAdminBtn.addEventListener('click', () => { adminModal.style.display = 'none'; });
+    resetStatsBtn.addEventListener('click', () => {
+        if (confirm("Вы уверены, что хотите сбросить всю локальную статистику?")) {
+            resetStats();
+            alert("Локальная статистика сброшена.");
+        }
+    });
+    window.addEventListener('click', (e) => {
+        if (e.target === adminModal) adminModal.style.display = 'none';
+    });
+
+    // ===================== ИНИЦИАЛИЗАЦИЯ =====================
     if (localStorage.getItem('theme') === 'light') document.body.classList.add('light');
     themeBtn.addEventListener('click', toggleTheme);
     startBtn.addEventListener('click', startTraining);
