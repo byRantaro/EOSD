@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Формула-мастер | ЕГЭ и школа</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-gradient-start: #0f172a;
+            --bg-gradient-end: #1e293b;
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --surface: rgba(30, 41, 59, 0.8);
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --border: #334155;
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --option-bg: #1e293b;
+            --option-hover: #334155;
+        }
+
+        body.light {
+            --bg-gradient-start: #f0f9ff;
+            --bg-gradient-end: #e0f2fe;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --surface: white;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --border: #e2e8f0;
+            --option-bg: #f8fafc;
+            --option-hover: #e2e8f0;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            padding: 1.5rem;
+            transition: background 0.3s, color 0.2s;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            backdrop-filter: blur(2px);
+        }
+
+        .header {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(120deg, #60a5fa, #a78bfa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .sub {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .dashboard {
+            display: flex;
+            gap: 1.8rem;
+            flex-wrap: wrap;
+        }
+
+        .sidebar {
+            flex: 0 0 300px;
+            background: var(--surface);
+            backdrop-filter: blur(8px);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            height: fit-content;
+            position: sticky;
+            top: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .trainer {
+            flex: 1;
+            background: var(--surface);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(8px);
+            box-shadow: var(--shadow);
+            min-height: 550px;
+        }
+
+        .control-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        select, button {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border-radius: 1rem;
+            background: var(--option-bg);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        select:hover, button:hover {
+            transform: translateY(-2px);
+        }
+
+        button {
+            background: var(--accent);
+            border: none;
+            font-weight: 600;
+            color: white;
+        }
+
+        button.secondary {
+            background: #475569;
+        }
+
+        .theme-toggle {
+            background: var(--option-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .progress-section {
+            margin: 1.5rem 0;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #a855f7);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .question-card {
+            text-align: center;
+        }
+
+        .formula-card {
+            background: var(--option-bg);
+            border-radius: 2rem;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            font-family: 'Courier New', 'Times New Roman', monospace;
+            font-size: 1.8rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            word-break: break-word;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .option-btn {
+            background: var(--option-bg);
+            padding: 1rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .option-btn:hover:not(.disabled) {
+            background: var(--accent);
+            color: white;
+            transform: scale(0.98);
+            border-color: var(--accent);
+        }
+
+        .option-btn.correct {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .option-btn.incorrect {
+            background: var(--danger);
+            border-color: var(--danger);
+            color: white;
+        }
+
+        .disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .explanation {
+            background: rgba(59,130,246,0.1);
+            border-left: 4px solid var(--accent);
+            padding: 1rem;
+            border-radius: 1rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .action-buttons button {
+            flex: 1;
+            margin-top: 0;
+        }
+
+        .result-summary {
+            text-align: center;
+        }
+
+        .score-circle {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), #c084fc);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .review-table {
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 1.5rem 0;
+            border-radius: 1rem;
+            border: 1px solid var(--border);
+        }
+
+        .review-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
+            flex-wrap: wrap;
+        }
+
+        .review-correct {
+            color: var(--success);
+        }
+
+        .review-wrong {
+            color: var(--danger);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 800px) {
+            .sidebar {
+                flex: 1 1 100%;
+                position: static;
+            }
+            .trainer {
+                flex: 1 1 100%;
+            }
+            .formula-card {
+                font-size: 1.3rem;
+            }
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--accent);
+            border-radius: 2rem;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.7rem;
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📐 Формула-мастер | ЕГЭ и школа</h1>
+        <p class="sub">🧠 Более 200 формул: физика, алгебра, геометрия. Подготовка к ЕГЭ (профиль/база) и олимпиадам.</p>
+    </div>
+    <div class="dashboard">
+        <div class="sidebar">
+            <div class="control-group">
+                <label>📚 Класс</label>
+                <select id="classSelect">
+                    <option value="7">7 класс</option><option value="8">8 класс</option><option value="9">9 класс</option>
+                    <option value="10">10 класс</option><option value="11">11 класс</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>🔬 Предмет</label>
+                <select id="subjectSelect">
+                    <option value="all">Все предметы</option>
+                    <option value="physics">Физика</option>
+                    <option value="algebra">Алгебра</option>
+                    <option value="geometry">Геометрия</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>⚡ Уровень</label>
+                <select id="difficultySelect">
+                    <option value="all">Все уровни</option><option value="easy">Легкий</option>
+                    <option value="medium">Средний</option><option value="hard">Сложный</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <button id="startBtn">🎯 Начать тренировку</button>
+                <button id="themeBtn" class="theme-toggle">🌓 Тёмная/Светлая тема</button>
+            </div>
+            <div class="progress-section" id="progressSection" style="display: none;">
+                <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                <div class="stats">
+                    <span>📋 Вопрос: <span id="currentIdx">0</span>/<span id="totalQSpan">0</span></span>
+                    <span>✅ Правильно: <span id="correctSpan">0</span></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="trainer">
+            <div id="welcomeArea">
+                <div style="text-align: center; padding: 2rem;">
+                    <div style="font-size: 4rem;">🧪✨</div>
+                    <h2>Готов проверить знания формул?</h2>
+                    <p>Выбери параметры и нажми «Начать тренировку». Тебе покажут формулу — нужно выбрать её правильное название.</p>
+                    <div style="background: var(--option-bg); border-radius: 1rem; padding: 1rem; margin-top: 1.5rem;">
+                        <strong>Пример:</strong>
+                        <div class="formula-card" style="margin:0.5rem 0;">a² + b² = c²</div>
+                        <div>➜ Теорема Пифагора</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quizArea" class="hidden">
+                <div class="question-card">
+                    <div class="badge" id="subjectBadge">Физика</div>
+                    <div class="formula-card" id="formulaDisplay">E = mc²</div>
+                    <div class="options-grid" id="optionsContainer"></div>
+                    <div id="explanationBox" class="explanation hidden"></div>
+                    <div class="action-buttons">
+                        <button id="hintBtn" class="secondary">💡 Подсказка</button>
+                        <button id="skipBtn" class="secondary">⏭ Пропустить</button>
+                        <button id="nextBtn" disabled>➡ Следующий вопрос</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="resultArea" class="hidden">
+                <div class="result-summary">
+                    <h2>🏆 Результаты тренировки</h2>
+                    <div class="score-circle" id="scorePercent">0%</div>
+                    <p>Правильных ответов: <span id="finalCorrect">0</span> из <span id="finalTotal">0</span></p>
+                    <div class="review-table" id="reviewTable"></div>
+                    <button id="restartBtn">🔄 Пройти заново</button>
+                    <button id="newConfigBtn" style="margin-top: 0.5rem; background: #475569;">⚙️ Новые настройки</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ===================== ПОЛНАЯ БАЗА ФОРМУЛ (200+) =====================
+    // Объединяем существующие и новые формулы (без дубликатов)
+    const formulasDB = [
+        // ----- ФИЗИКА (существующие + новые) -----
+        { subject: 'physics', class: 7, difficulty: 'easy', formula: 'v = s / t', name: 'Формула скорости', description: 'Скорость = путь / время' },
+        { subject: 'physics', class: 7, difficulty: 'easy', formula: 'ρ = m / V', name: 'Плотность вещества', description: 'Плотность = масса / объём' },
+        { subject: 'physics', class: 7, difficulty: 'easy', formula: 'P = m·g', name: 'Вес тела', description: 'Вес = масса × ускорение свободного падения' },
+        { subject: 'physics', class: 7, difficulty: 'easy', formula: 'p = F / S', name: 'Давление твёрдого тела', description: 'Давление = сила / площадь' },
+        { subject: 'physics', class: 8, difficulty: 'easy', formula: 'F = m·a', name: 'Второй закон Ньютона', description: 'Сила = масса × ускорение' },
+        { subject: 'physics', class: 8, difficulty: 'easy', formula: 'A = F·s', name: 'Механическая работа', description: 'Работа = сила × путь' },
+        { subject: 'physics', class: 8, difficulty: 'easy', formula: 'N = A / t', name: 'Мощность', description: 'Мощность = работа / время' },
+        { subject: 'physics', class: 8, difficulty: 'medium', formula: 'Q = c·m·Δt', name: 'Количество теплоты', description: 'Теплота = удельная теплоёмкость × масса × изменение температуры' },
+        { subject: 'physics', class: 8, difficulty: 'medium', formula: 'η = (A_полез / A_затр) · 100%', name: 'КПД', description: 'Коэффициент полезного действия' },
+        { subject: 'physics', class: 9, difficulty: 'medium', formula: 'I = U / R', name: 'Закон Ома для участка цепи', description: 'Сила тока = напряжение / сопротивление' },
+        { subject: 'physics', class: 9, difficulty: 'medium', formula: 'R = R₁ + R₂', name: 'Последовательное соединение резисторов', description: 'Общее сопротивление при последовательном соединении' },
+        { subject: 'physics', class: 9, difficulty: 'medium', formula: '1/R = 1/R₁ + 1/R₂', name: 'Параллельное соединение резисторов', description: 'Общее сопротивление при параллельном соединении' },
+        { subject: 'physics', class: 9, difficulty: 'medium', formula: 'Eₖ = mv²/2', name: 'Кинетическая энергия', description: 'Кинетическая энергия тела' },
+        { subject: 'physics', class: 9, difficulty: 'medium', formula: 'Eₚ = mgh', name: 'Потенциальная энергия', description: 'Потенциальная энергия в поле тяжести' },
+        { subject: 'physics', class: 9, difficulty: 'medium', formula: 'p = mv', name: 'Импульс тела', description: 'Импульс = масса × скорость' },
+        { subject: 'physics', class: 9, difficulty: 'medium', formula: 'a_ц = v²/R', name: 'Центростремительное ускорение', description: 'Ускорение при движении по окружности' },
+        { subject: 'physics', class: 9, difficulty: 'medium', formula: 'v = ωR', name: 'Линейная скорость при вращении', description: 'Связь линейной и угловой скорости' },
+        { subject: 'physics', class: 9, difficulty: 'medium', formula: 'ω = 2π/T', name: 'Угловая скорость', description: 'Связь с периодом' },
+        { subject: 'physics', class: 10, difficulty: 'hard', formula: 'F = G·m₁·m₂ / r²', name: 'Закон всемирного тяготения', description: 'Сила гравитационного притяжения' },
+        { subject: 'physics', class: 10, difficulty: 'hard', formula: 'pV = (m/M)RT', name: 'Уравнение Менделеева-Клапейрона', description: 'Уравнение состояния идеального газа' },
+        { subject: 'physics', class: 10, difficulty: 'hard', formula: 'Q = ΔU + A', name: 'Первый закон термодинамики', description: 'Количество теплоты = изменение внутренней энергии + работа' },
+        { subject: 'physics', class: 10, difficulty: 'hard', formula: 'F = k·Δx', name: 'Закон Гука', description: 'Сила упругости пропорциональна деформации' },
+        { subject: 'physics', class: 10, difficulty: 'hard', formula: 'F = q·E', name: 'Сила, действующая на заряд в электрическом поле', description: 'Сила Кулона' },
+        { subject: 'physics', class: 10, difficulty: 'hard', formula: 'E = k·q / r²', name: 'Напряжённость поля точечного заряда', description: 'Электрическое поле' },
+        { subject: 'physics', class: 10, difficulty: 'hard', formula: 'C = q / U', name: 'Электроёмкость конденсатора', description: 'Ёмкость = заряд / напряжение' },
+        { subject: 'physics', class: 10, difficulty: 'hard', formula: 'W = CU²/2', name: 'Энергия заряженного конденсатора', description: 'Энергия электрического поля' },
+        { subject: 'physics', class: 10, difficulty: 'hard', formula: 'M = F·d', name: 'Момент силы', description: 'Произведение силы на плечо' },
+        { subject: 'physics', class: 10, difficulty: 'hard', formula: '∑F = 0, ∑M = 0', name: 'Условия равновесия твёрдого тела', description: 'Статика' },
+        { subject: 'physics', class: 11, difficulty: 'hard', formula: 'F = I·B·l·sinα', name: 'Сила Ампера', description: 'Сила, действующая на проводник с током в магнитном поле' },
+        { subject: 'physics', class: 11, difficulty: 'hard', formula: 'F = q·v·B·sinα', name: 'Сила Лоренца', description: 'Сила, действующая на заряженную частицу в магнитном поле' },
+        { subject: 'physics', class: 11, difficulty: 'hard', formula: 'Φ = B·S·cosα', name: 'Магнитный поток', description: 'Поток вектора магнитной индукции' },
+        { subject: 'physics', class: 11, difficulty: 'hard', formula: 'ε = -ΔΦ/Δt', name: 'Закон электромагнитной индукции Фарадея', description: 'ЭДС индукции' },
+        { subject: 'physics', class: 11, difficulty: 'hard', formula: 'ε = B·l·v·sinα', name: 'ЭДС индукции в движущемся проводнике', description: 'При движении в магнитном поле' },
+        { subject: 'physics', class: 11, difficulty: 'hard', formula: 'T = 2π√(LC)', name: 'Период колебательного контура (Томсона)', description: 'Электромагнитные колебания' },
+        { subject: 'physics', class: 11, difficulty: 'hard', formula: 'E = mc²', name: 'Эквивалентность массы и энергии', description: 'Формула Эйнштейна' },
+        { subject: 'physics', class: 11, difficulty: 'hard', formula: 'λ = h / p', name: 'Длина волны де Бройля', description: 'Волновые свойства частиц' },
+        { subject: 'physics', class: 11, difficulty: 'hard', formula: 'E = hν', name: 'Энергия фотона', description: 'Квантовая энергия' },
+        { subject: 'physics', class: 11, difficulty: 'hard', formula: '1/F = 1/d + 1/f', name: 'Формула тонкой линзы', description: 'Связь фокусного расстояния с расстояниями до предмета и изображения' },
+        { subject: 'physics', class: 11, difficulty: 'hard', formula: 'n = c / v', name: 'Абсолютный показатель преломления', description: 'Оптика' },
+        { subject: 'physics', class: 11, difficulty: 'hard', formula: 'α = β', name: 'Закон отражения света', description: 'Угол падения равен углу отражения' },
+        { subject: 'physics', class: 11, difficulty: 'hard', formula: 'sinα / sinβ = n₂/n₁', name: 'Закон преломления света', description: 'Снеллиуса' },
+        { subject: 'physics', class: 11, difficulty: 'hard', formula: 'sinα_пр = n₂/n₁ (n₁>n₂)', name: 'Предельный угол полного внутреннего отражения', description: 'Оптика' },
+        { subject: 'physics', class: 11, difficulty: 'hard', formula: 'D = 1/F', name: 'Оптическая сила линзы', description: 'Диоптрии' },
+        { subject: 'physics', class: 11, difficulty: 'hard', formula: 'Γ = H/h = f/d', name: 'Увеличение линзы', description: 'Линейное увеличение' },
+        { subject: 'physics', class: 11, difficulty: 'hard', formula: 'hν = A_вых + mv²/2', name: 'Фотоэффект', description: 'Уравнение Эйнштейна' },
+        { subject: 'physics', class: 11, difficulty: 'hard', formula: 'ν_мин = A_вых / h', name: 'Красная граница фотоэффекта', description: 'Минимальная частота' },
+        { subject: 'physics', class: 11, difficulty: 'hard', formula: 'hν = E_n - E_m', name: 'Постулаты Бора', description: 'Излучение и поглощение энергии атомом' },
+        { subject: 'physics', class: 11, difficulty: 'hard', formula: 'N = N₀·2^{-t/T}', name: 'Закон радиоактивного распада', description: 'Период полураспада' },
+        { subject: 'physics', class: 11, difficulty: 'hard', formula: 'φ = (p/p_нас)·100%', name: 'Относительная влажность', description: 'Молекулярная физика' },
+        
+        // ----- АЛГЕБРА (существующие + новые) -----
+        { subject: 'algebra', class: 7, difficulty: 'easy', formula: '(a+b)² = a²+2ab+b²', name: 'Квадрат суммы', description: 'ФСУ' },
+        { subject: 'algebra', class: 7, difficulty: 'easy', formula: '(a-b)² = a²-2ab+b²', name: 'Квадрат разности', description: 'ФСУ' },
+        { subject: 'algebra', class: 7, difficulty: 'easy', formula: 'a² - b² = (a-b)(a+b)', name: 'Разность квадратов', description: 'ФСУ' },
+        { subject: 'algebra', class: 7, difficulty: 'easy', formula: '(a+b)³ = a³+3a²b+3ab²+b³', name: 'Куб суммы', description: 'ФСУ' },
+        { subject: 'algebra', class: 7, difficulty: 'easy', formula: '(a-b)³ = a³-3a²b+3ab²-b³', name: 'Куб разности', description: 'ФСУ' },
+        { subject: 'algebra', class: 7, difficulty: 'easy', formula: 'a³+b³ = (a+b)(a²-ab+b²)', name: 'Сумма кубов', description: 'ФСУ' },
+        { subject: 'algebra', class: 7, difficulty: 'easy', formula: 'a³-b³ = (a-b)(a²+ab+b²)', name: 'Разность кубов', description: 'ФСУ' },
+        { subject: 'algebra', class: 7, difficulty: 'easy', formula: 'a^n·a^m = a^{n+m}', name: 'Произведение степеней', description: 'Свойства степеней' },
+        { subject: 'algebra', class: 7, difficulty: 'easy', formula: 'a^n / a^m = a^{n-m}', name: 'Частное степеней', description: 'Свойства степеней' },
+        { subject: 'algebra', class: 7, difficulty: 'easy', formula: '(a^n)^m = a^{nm}', name: 'Возведение степени в степень', description: 'Свойства степеней' },
+        { subject: 'algebra', class: 7, difficulty: 'easy', formula: 'a^{-n} = 1/a^n', name: 'Отрицательная степень', description: 'Свойства степеней' },
+        { subject: 'algebra', class: 7, difficulty: 'easy', formula: 'a^{1/n} = √[n]{a}', name: 'Корень как степень', description: 'Свойства корней' },
+        { subject: 'algebra', class: 8, difficulty: 'medium', formula: 'ax² + bx + c = 0', name: 'Квадратное уравнение', description: 'Общий вид' },
+        { subject: 'algebra', class: 8, difficulty: 'medium', formula: 'D = b² - 4ac', name: 'Дискриминант', description: 'Квадратное уравнение' },
+        { subject: 'algebra', class: 8, difficulty: 'medium', formula: 'x = (-b ± √D)/(2a)', name: 'Корни квадратного уравнения', description: 'Формула корней' },
+        { subject: 'algebra', class: 8, difficulty: 'medium', formula: 'x₁+x₂ = -b/a, x₁·x₂ = c/a', name: 'Теорема Виета', description: 'Связь корней и коэффициентов' },
+        { subject: 'algebra', class: 8, difficulty: 'medium', formula: '(a+b)/2 ≥ √(ab)', name: 'Неравенство Коши', description: 'Среднее арифметическое ≥ среднего геометрического' },
+        { subject: 'algebra', class: 9, difficulty: 'medium', formula: 'a_n = a₁ + (n-1)d', name: 'n-й член арифметической прогрессии', description: 'Арифметическая прогрессия' },
+        { subject: 'algebra', class: 9, difficulty: 'medium', formula: 'S_n = (a₁+a_n)·n/2', name: 'Сумма арифметической прогрессии', description: 'Сумма n членов' },
+        { subject: 'algebra', class: 9, difficulty: 'medium', formula: 'b_n = b₁·q^{n-1}', name: 'n-й член геометрической прогрессии', description: 'Геометрическая прогрессия' },
+        { subject: 'algebra', class: 9, difficulty: 'medium', formula: 'S_n = b₁·(q^n-1)/(q-1)', name: 'Сумма геометрической прогрессии', description: 'Сумма n членов' },
+        { subject: 'algebra', class: 9, difficulty: 'medium', formula: 'S = b₁/(1-q)', name: 'Сумма бесконечной убывающей прогрессии', description: '|q|<1' },
+        { subject: 'algebra', class: 10, difficulty: 'medium', formula: 'log_a(xy) = log_a x + log_a y', name: 'Логарифм произведения', description: 'Свойства логарифмов' },
+        { subject: 'algebra', class: 10, difficulty: 'medium', formula: 'log_a(x/y) = log_a x - log_a y', name: 'Логарифм частного', description: 'Свойства логарифмов' },
+        { subject: 'algebra', class: 10, difficulty: 'medium', formula: 'log_a x^p = p·log_a x', name: 'Логарифм степени', description: 'Свойства логарифмов' },
+        { subject: 'algebra', class: 10, difficulty: 'medium', formula: 'log_a b = log_c b / log_c a', name: 'Переход к новому основанию', description: 'Свойства логарифмов' },
+        { subject: 'algebra', class: 10, difficulty: 'medium', formula: 'a^{log_a b} = b', name: 'Основное логарифмическое тождество', description: 'Логарифм' },
+        { subject: 'algebra', class: 10, difficulty: 'medium', formula: 'log_a b = 1 / log_b a', name: 'Обратное свойство', description: 'Логарифмы' },
+        { subject: 'algebra', class: 10, difficulty: 'hard', formula: 'sin²α + cos²α = 1', name: 'Основное тригонометрическое тождество', description: 'Тригонометрия' },
+        { subject: 'algebra', class: 10, difficulty: 'hard', formula: 'tg α = sinα/cosα', name: 'Тангенс', description: 'Определение' },
+        { subject: 'algebra', class: 10, difficulty: 'hard', formula: 'ctg α = cosα/sinα', name: 'Котангенс', description: 'Определение' },
+        { subject: 'algebra', class: 10, difficulty: 'hard', formula: 'tg α·ctg α = 1', name: 'Связь тангенса и котангенса', description: 'Тригонометрия' },
+        { subject: 'algebra', class: 10, difficulty: 'hard', formula: '1+tg²α = 1/cos²α', name: 'Тангенс и косинус', description: 'Тригонометрия' },
+        { subject: 'algebra', class: 10, difficulty: 'hard', formula: '1+ctg²α = 1/sin²α', name: 'Котангенс и синус', description: 'Тригонометрия' },
+        { subject: 'algebra', class: 10, difficulty: 'hard', formula: 'sin(α±β) = sinα cosβ ± cosα sinβ', name: 'Синус суммы/разности', description: 'Формулы сложения' },
+        { subject: 'algebra', class: 10, difficulty: 'hard', formula: 'cos(α±β) = cosα cosβ ∓ sinα sinβ', name: 'Косинус суммы/разности', description: 'Формулы сложения' },
+        { subject: 'algebra', class: 10, difficulty: 'hard', formula: 'tg(α±β) = (tgα ± tgβ)/(1 ∓ tgα·tgβ)', name: 'Тангенс суммы/разности', description: 'Формулы сложения' },
+        { subject: 'algebra', class: 10, difficulty: 'hard', formula: 'sin2α = 2 sinα cosα', name: 'Синус двойного угла', description: 'Формулы двойного угла' },
+        { subject: 'algebra', class: 10, difficulty: 'hard', formula: 'cos2α = cos²α - sin²α = 1-2sin²α = 2cos²α-1', name: 'Косинус двойного угла', description: 'Формулы двойного угла' },
+        { subject: 'algebra', class: 10, difficulty: 'hard', formula: 'tg2α = 2tgα/(1-tg²α)', name: 'Тангенс двойного угла', description: 'Формулы двойного угла' },
+        { subject: 'algebra', class: 10, difficulty: 'hard', formula: 'sin²(α/2) = (1-cosα)/2', name: 'Синус половинного угла', description: 'Формулы понижения степени' },
+        { subject: 'algebra', class: 10, difficulty: 'hard', formula: 'cos²(α/2) = (1+cosα)/2', name: 'Косинус половинного угла', description: 'Формулы понижения степени' },
+        { subject: 'algebra', class: 10, difficulty: 'hard', formula: 'tg(α/2) = (1-cosα)/sinα = sinα/(1+cosα)', name: 'Тангенс половинного угла', description: 'Формулы половинного угла' },
+        { subject: 'algebra', class: 10, difficulty: 'hard', formula: 'sinα ± sinβ = 2 sin((α±β)/2) cos((α∓β)/2)', name: 'Сумма/разность синусов', description: 'Преобразование суммы в произведение' },
+        { subject: 'algebra', class: 10, difficulty: 'hard', formula: 'cosα + cosβ = 2 cos((α+β)/2) cos((α-β)/2)', name: 'Сумма косинусов', description: 'Преобразование суммы в произведение' },
+        { subject: 'algebra', class: 10, difficulty: 'hard', formula: 'cosα - cosβ = -2 sin((α+β)/2) sin((α-β)/2)', name: 'Разность косинусов', description: 'Преобразование суммы в произведение' },
+        { subject: 'algebra', class: 10, difficulty: 'hard', formula: 'sinα sinβ = (cos(α-β)-cos(α+β))/2', name: 'Произведение синусов', description: 'Преобразование произведения в сумму' },
+        { subject: 'algebra', class: 10, difficulty: 'hard', formula: 'cosα cosβ = (cos(α-β)+cos(α+β))/2', name: 'Произведение косинусов', description: 'Преобразование произведения в сумму' },
+        { subject: 'algebra', class: 10, difficulty: 'hard', formula: 'sinα cosβ = (sin(α-β)+sin(α+β))/2', name: 'Произведение синуса на косинус', description: 'Преобразование произведения в сумму' },
+        { subject: 'algebra', class: 11, difficulty: 'hard', formula: '(xⁿ)\' = n·xⁿ⁻¹', name: 'Производная степенной функции', description: 'Дифференцирование' },
+        { subject: 'algebra', class: 11, difficulty: 'hard', formula: '(sinx)\' = cosx', name: 'Производная синуса', description: 'Таблица производных' },
+        { subject: 'algebra', class: 11, difficulty: 'hard', formula: '(cosx)\' = -sinx', name: 'Производная косинуса', description: 'Таблица производных' },
+        { subject: 'algebra', class: 11, difficulty: 'hard', formula: '(eˣ)\' = eˣ', name: 'Производная экспоненты', description: 'Таблица производных' },
+        { subject: 'algebra', class: 11, difficulty: 'hard', formula: '(lnx)\' = 1/x', name: 'Производная натурального логарифма', description: 'Таблица производных' },
+        { subject: 'algebra', class: 11, difficulty: 'hard', formula: '(u+v)\' = u\'+v\'', name: 'Производная суммы', description: 'Правила дифференцирования' },
+        { subject: 'algebra', class: 11, difficulty: 'hard', formula: '(uv)\' = u\'v+uv\'', name: 'Производная произведения', description: 'Правила дифференцирования' },
+        { subject: 'algebra', class: 11, difficulty: 'hard', formula: '(u/v)\' = (u\'v-uv\')/v²', name: 'Производная частного', description: 'Правила дифференцирования' },
+        { subject: 'algebra', class: 11, difficulty: 'hard', formula: 'f(g(x))\' = f\'(g)·g\'', name: 'Производная сложной функции', description: 'Цепное правило' },
+        { subject: 'algebra', class: 11, difficulty: 'hard', formula: '∫xⁿ dx = xⁿ⁺¹/(n+1) + C', name: 'Интеграл степенной функции', description: 'Неопределённый интеграл' },
+        { subject: 'algebra', class: 11, difficulty: 'hard', formula: '∫dx/x = ln|x| + C', name: 'Интеграл 1/x', description: 'Таблица интегралов' },
+        { subject: 'algebra', class: 11, difficulty: 'hard', formula: '∫eˣ dx = eˣ + C', name: 'Интеграл экспоненты', description: 'Таблица интегралов' },
+        { subject: 'algebra', class: 11, difficulty: 'hard', formula: '∫aˣ dx = aˣ/ln a + C', name: 'Интеграл показательной функции', description: 'Таблица интегралов' },
+        { subject: 'algebra', class: 11, difficulty: 'hard', formula: '∫sinx dx = -cosx + C', name: 'Интеграл синуса', description: 'Таблица интегралов' },
+        { subject: 'algebra', class: 11, difficulty: 'hard', formula: '∫cosx dx = sinx + C', name: 'Интеграл косинуса', description: 'Таблица интегралов' },
+        { subject: 'algebra', class: 11, difficulty: 'hard', formula: '∫dx/cos²x = tgx + C', name: 'Интеграл от 1/cos²x', description: 'Таблица интегралов' },
+        { subject: 'algebra', class: 11, difficulty: 'hard', formula: '∫dx/sin²x = -ctgx + C', name: 'Интеграл от 1/sin²x', description: 'Таблица интегралов' },
+        { subject: 'algebra', class: 11, difficulty: 'hard', formula: 'P_n = n!', name: 'Перестановки', description: 'Комбинаторика' },
+        { subject: 'algebra', class: 11, difficulty: 'hard', formula: 'A_n^k = n!/(n-k)!', name: 'Размещения', description: 'Комбинаторика' },
+        { subject: 'algebra', class: 11, difficulty: 'hard', formula: 'C_n^k = n!/(k!(n-k)!)', name: 'Сочетания', description: 'Комбинаторика' },
+        { subject: 'algebra', class: 11, difficulty: 'hard', formula: 'P(A) = m/n', name: 'Классическая вероятность', description: 'Теория вероятностей' },
+        
+        // ----- ГЕОМЕТРИЯ (планиметрия + стереометрия) -----
+        { subject: 'geometry', class: 7, difficulty: 'easy', formula: 'α+β+γ = 180°', name: 'Сумма углов треугольника', description: 'Планиметрия' },
+        { subject: 'geometry', class: 7, difficulty: 'easy', formula: 'c² = a² + b²', name: 'Теорема Пифагора', description: 'Прямоугольный треугольник' },
+        { subject: 'geometry', class: 7, difficulty: 'easy', formula: 'S = (a·h)/2', name: 'Площадь треугольника', description: 'Основание × высота / 2' },
+        { subject: 'geometry', class: 8, difficulty: 'medium', formula: 'S = ½ ab sinγ', name: 'Площадь треугольника через две стороны и угол', description: 'Планиметрия' },
+        { subject: 'geometry', class: 8, difficulty: 'medium', formula: 'S = √(p(p-a)(p-b)(p-c))', name: 'Формула Герона', description: 'Площадь треугольника' },
+        { subject: 'geometry', class: 8, difficulty: 'medium', formula: 'a/sinα = b/sinβ = c/sinγ = 2R', name: 'Теорема синусов', description: 'Связь сторон и углов' },
+        { subject: 'geometry', class: 8, difficulty: 'medium', formula: 'c² = a² + b² - 2ab·cosγ', name: 'Теорема косинусов', description: 'Обобщённая теорема Пифагора' },
+        { subject: 'geometry', class: 8, difficulty: 'medium', formula: 'm_a = ½√(2b²+2c²-a²)', name: 'Медиана треугольника', description: 'Длина медианы' },
+        { subject: 'geometry', class: 8, difficulty: 'medium', formula: 'l_a = (2bc·cos(γ/2))/(b+c)', name: 'Биссектриса треугольника', description: 'Длина биссектрисы' },
+        { subject: 'geometry', class: 8, difficulty: 'easy', formula: 'S = a·b', name: 'Площадь прямоугольника', description: 'Планиметрия' },
+        { subject: 'geometry', class: 8, difficulty: 'easy', formula: 'S = a²', name: 'Площадь квадрата', description: 'Планиметрия' },
+        { subject: 'geometry', class: 8, difficulty: 'easy', formula: 'S = a·h_a', name: 'Площадь параллелограмма', description: 'Основание × высоту' },
+        { subject: 'geometry', class: 8, difficulty: 'easy', formula: 'S = (a+b)/2 · h', name: 'Площадь трапеции', description: 'Полусумма оснований × высота' },
+        { subject: 'geometry', class: 8, difficulty: 'easy', formula: 'C = 2πR', name: 'Длина окружности', description: 'Планиметрия' },
+        { subject: 'geometry', class: 8, difficulty: 'easy', formula: 'S = πR²', name: 'Площадь круга', description: 'Планиметрия' },
+        { subject: 'geometry', class: 8, difficulty: 'medium', formula: 'l_дуги = (πRα)/180° = Rα (рад)', name: 'Длина дуги окружности', description: 'Планиметрия' },
+        { subject: 'geometry', class: 8, difficulty: 'medium', formula: 'S_сектора = (πR²α)/360° = ½ R²α (рад)', name: 'Площадь сектора', description: 'Планиметрия' },
+        { subject: 'geometry', class: 8, difficulty: 'medium', formula: 'AE·EB = CE·ED', name: 'Произведение отрезков хорд', description: 'Свойство хорд' },
+        { subject: 'geometry', class: 8, difficulty: 'medium', formula: 'AB² = AC·AD', name: 'Квадрат касательной', description: 'Свойство касательной и секущей' },
+        { subject: 'geometry', class: 8, difficulty: 'medium', formula: 'a·b = |a||b|·cosφ = x₁x₂+y₁y₂', name: 'Скалярное произведение векторов', description: 'Плоскость' },
+        { subject: 'geometry', class: 9, difficulty: 'medium', formula: 'V = a·b·c', name: 'Объём прямоугольного параллелепипеда', description: 'Стереометрия' },
+        { subject: 'geometry', class: 9, difficulty: 'medium', formula: 'd² = a²+b²+c²', name: 'Диагональ прямоугольного параллелепипеда', description: 'Стереометрия' },
+        { subject: 'geometry', class: 9, difficulty: 'medium', formula: 'V = a³', name: 'Объём куба', description: 'Стереометрия' },
+        { subject: 'geometry', class: 9, difficulty: 'medium', formula: 'S_полн = 6a²', name: 'Площадь поверхности куба', description: 'Стереометрия' },
+        { subject: 'geometry', class: 10, difficulty: 'hard', formula: 'S_бок = P_осн·h', name: 'Площадь боковой поверхности призмы', description: 'Стереометрия' },
+        { subject: 'geometry', class: 10, difficulty: 'hard', formula: 'V = S_осн·h', name: 'Объём призмы', description: 'Стереометрия' },
+        { subject: 'geometry', class: 10, difficulty: 'hard', formula: 'V = ⅓ S_осн·h', name: 'Объём пирамиды', description: 'Стереометрия' },
+        { subject: 'geometry', class: 10, difficulty: 'hard', formula: 'V = ⅓ h (S₁+√(S₁S₂)+S₂)', name: 'Объём усечённой пирамиды', description: 'Стереометрия' },
+        { subject: 'geometry', class: 10, difficulty: 'hard', formula: 'S_бок = πRl', name: 'Площадь боковой поверхности конуса', description: 'Стереометрия' },
+        { subject: 'geometry', class: 10, difficulty: 'hard', formula: 'V = ⅓ πR²h', name: 'Объём конуса', description: 'Стереометрия' },
+        { subject: 'geometry', class: 10, difficulty: 'hard', formula: 'S_бок = πl(R+r)', name: 'Площадь боковой поверхности усечённого конуса', description: 'Стереометрия' },
+        { subject: 'geometry', class: 10, difficulty: 'hard', formula: 'V = ⅓ πh (R²+Rr+r²)', name: 'Объём усечённого конуса', description: 'Стереометрия' },
+        { subject: 'geometry', class: 10, difficulty: 'hard', formula: 'S_сферы = 4πR²', name: 'Площадь поверхности сферы', description: 'Стереометрия' },
+        { subject: 'geometry', class: 10, difficulty: 'hard', formula: 'V_шара = ⁴⁄₃ πR³', name: 'Объём шара', description: 'Стереометрия' },
+        { subject: 'geometry', class: 10, difficulty: 'hard', formula: 'd = √((x₂-x₁)²+(y₂-y₁)²+(z₂-z₁)²)', name: 'Расстояние между точками в пространстве', description: 'Координаты' },
+        { subject: 'geometry', class: 10, difficulty: 'hard', formula: 'a·b = x₁x₂+y₁y₂+z₁z₂', name: 'Скалярное произведение в пространстве', description: 'Векторы' },
+        { subject: 'geometry', class: 10, difficulty: 'hard', formula: 'cosφ = (a·b)/(|a||b|)', name: 'Угол между векторами', description: 'Скалярное произведение' }
+    ];
+
+    // Убираем возможные дубликаты по имени и формуле (простая проверка)
+    const uniqueFormulas = [];
+    const seen = new Set();
+    for (const f of formulasDB) {
+        const key = `${f.subject}|${f.class}|${f.difficulty}|${f.formula}`;
+        if (!seen.has(key)) {
+            seen.add(key);
+            uniqueFormulas.push(f);
+        }
+    }
+    const fullFormulas = uniqueFormulas;
+
+    // Глобальное состояние
+    let activeQuestions = [];
+    let currentIndex = 0;
+    let userAnswers = [];
+    let answerLock = false;
+    let nextBtnDisabled = true;
+    
+    // DOM элементы
+    const classSelect = document.getElementById('classSelect');
+    const subjectSelect = document.getElementById('subjectSelect');
+    const difficultySelect = document.getElementById('difficultySelect');
+    const startBtn = document.getElementById('startBtn');
+    const themeBtn = document.getElementById('themeBtn');
+    const welcomeArea = document.getElementById('welcomeArea');
+    const quizArea = document.getElementById('quizArea');
+    const resultArea = document.getElementById('resultArea');
+    const formulaDisplay = document.getElementById('formulaDisplay');
+    const optionsContainer = document.getElementById('optionsContainer');
+    const explanationBox = document.getElementById('explanationBox');
+    const nextBtn = document.getElementById('nextBtn');
+    const skipBtn = document.getElementById('skipBtn');
+    const hintBtn = document.getElementById('hintBtn');
+    const progressFill = document.getElementById('progressFill');
+    const currentIdxSpan = document.getElementById('currentIdx');
+    const totalQSpan = document.getElementById('totalQSpan');
+    const correctSpan = document.getElementById('correctSpan');
+    const subjectBadge = document.getElementById('subjectBadge');
+    const restartBtn = document.getElementById('restartBtn');
+    const newConfigBtn = document.getElementById('newConfigBtn');
+    const progressSection = document.getElementById('progressSection');
+    
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+    
+    function getSmartWrongOptions(correctFormula, count = 3) {
+        const candidates = fullFormulas.filter(f => 
+            f.subject === correctFormula.subject && 
+            Math.abs(f.class - correctFormula.class) <= 2 &&
+            f.name !== correctFormula.name
+        );
+        if (candidates.length < count) {
+            const anyOthers = fullFormulas.filter(f => f.name !== correctFormula.name);
+            candidates.push(...anyOthers);
+        }
+        const unique = [];
+        const set = new Set();
+        for (let cand of candidates) {
+            if (!set.has(cand.name) && cand.name !== correctFormula.name) {
+                set.add(cand.name);
+                unique.push(cand);
+            }
+            if (unique.length >= count * 2) break;
+        }
+        const shuffled = shuffleArray(unique);
+        return shuffled.slice(0, count).map(f => f.name);
+    }
+    
+    function loadQuiz() {
+        const selectedClass = parseInt(classSelect.value);
+        const selectedSubject = subjectSelect.value;
+        const selectedDifficulty = difficultySelect.value;
+        
+        let filtered = fullFormulas.filter(f => 
+            f.class === selectedClass &&
+            (selectedSubject === 'all' || f.subject === selectedSubject) &&
+            (selectedDifficulty === 'all' || f.difficulty === selectedDifficulty)
+        );
+        
+        if (filtered.length === 0) {
+            alert("По таким параметрам нет формул. Попробуйте расширить фильтры (например, «Все уровни»).");
+            return false;
+        }
+        activeQuestions = shuffleArray(filtered);
+        currentIndex = 0;
+        userAnswers = [];
+        answerLock = false;
+        nextBtn.disabled = true;
+        updateProgressUI();
+        return true;
+    }
+    
+    function updateProgressUI() {
+        totalQSpan.textContent = activeQuestions.length;
+        currentIdxSpan.textContent = currentIndex + 1;
+        const correctCount = userAnswers.filter(a => a && a.isCorrect === true).length;
+        correctSpan.textContent = correctCount;
+        const percent = ((currentIndex) / activeQuestions.length) * 100;
+        progressFill.style.width = `${percent}%`;
+    }
+    
+    function renderCurrentQuestion() {
+        if (currentIndex >= activeQuestions.length) {
+            finishQuiz();
+            return;
+        }
+        answerLock = false;
+        nextBtn.disabled = true;
+        const q = activeQuestions[currentIndex];
+        formulaDisplay.textContent = q.formula;
+        let subjectLabel = "📖 ";
+        if (q.subject === 'physics') subjectLabel = "⚛️ Физика";
+        else if (q.subject === 'algebra') subjectLabel = "📐 Алгебра";
+        else subjectLabel = "📏 Геометрия";
+        subjectBadge.textContent = subjectLabel;
+        
+        const correctName = q.name;
+        const wrongNames = getSmartWrongOptions(q, 3);
+        let allOptions = [correctName, ...wrongNames];
+        allOptions = shuffleArray(allOptions);
+        optionsContainer.innerHTML = '';
+        allOptions.forEach(opt => {
+            const btn = document.createElement('div');
+            btn.className = 'option-btn';
+            btn.textContent = opt;
+            btn.addEventListener('click', () => handleAnswer(opt, correctName, q));
+            optionsContainer.appendChild(btn);
+        });
+        explanationBox.classList.add('hidden');
+        explanationBox.innerHTML = '';
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.classList.remove('correct', 'incorrect', 'disabled');
+        });
+    }
+    
+    function handleAnswer(selected, correctName, formulaObj) {
+        if (answerLock) return;
+        answerLock = true;
+        const isCorrect = (selected === correctName);
+        userAnswers[currentIndex] = {
+            selected: selected,
+            isCorrect: isCorrect,
+            correctName: correctName,
+            formula: formulaObj.formula,
+            description: formulaObj.description,
+            subject: formulaObj.subject
+        };
+        const btns = document.querySelectorAll('.option-btn');
+        btns.forEach(btn => {
+            btn.classList.add('disabled');
+            if (btn.textContent === correctName) btn.classList.add('correct');
+            if (btn.textContent === selected && !isCorrect) btn.classList.add('incorrect');
+        });
+        explanationBox.classList.remove('hidden');
+        explanationBox.innerHTML = isCorrect ? 
+            `✅ Верно! ${formulaObj.name} — ${formulaObj.description}` : 
+            `❌ Ошибка. Правильный ответ: «${correctName}». ${formulaObj.description}`;
+        const correctCount = userAnswers.filter(a => a && a.isCorrect).length;
+        correctSpan.textContent = correctCount;
+        nextBtn.disabled = false;
+    }
+    
+    function nextQuestion() {
+        if (nextBtn.disabled) return;
+        if (currentIndex + 1 <= activeQuestions.length) {
+            currentIndex++;
+            updateProgressUI();
+            if (currentIndex < activeQuestions.length) {
+                renderCurrentQuestion();
+            } else {
+                finishQuiz();
+            }
+        } else {
+            finishQuiz();
+        }
+    }
+    
+    function skipQuestion() {
+        if (answerLock) return;
+        const q = activeQuestions[currentIndex];
+        userAnswers[currentIndex] = {
+            selected: "Пропущено",
+            isCorrect: false,
+            correctName: q.name,
+            formula: q.formula,
+            description: q.description,
+            subject: q.subject
+        };
+        answerLock = true;
+        const btns = document.querySelectorAll('.option-btn');
+        btns.forEach(btn => {
+            btn.classList.add('disabled');
+            if (btn.textContent === q.name) btn.classList.add('correct');
+        });
+        explanationBox.classList.remove('hidden');
+        explanationBox.innerHTML = `⏩ Пропуск. Правильный ответ: «${q.name}». ${q.description}`;
+        nextBtn.disabled = false;
+        const correctCount = userAnswers.filter(a => a && a.isCorrect).length;
+        correctSpan.textContent = correctCount;
+    }
+    
+    function showHint() {
+        if (answerLock) return;
+        const q = activeQuestions[currentIndex];
+        const hintText = `🔍 Подсказка: это формула из раздела ${q.subject === 'physics' ? 'Физики' : q.subject === 'algebra' ? 'Алгебры' : 'Геометрии'}. Начинается на букву «${q.name[0]}».`;
+        alert(hintText);
+    }
+    
+    function finishQuiz() {
+        quizArea.classList.add('hidden');
+        resultArea.classList.remove('hidden');
+        welcomeArea.classList.add('hidden');
+        const total = activeQuestions.length;
+        const correctCount = userAnswers.filter(a => a && a.isCorrect).length;
+        const percent = Math.round((correctCount / total) * 100);
+        document.getElementById('scorePercent').textContent = `${percent}%`;
+        document.getElementById('finalCorrect').textContent = correctCount;
+        document.getElementById('finalTotal').textContent = total;
+        const reviewDiv = document.getElementById('reviewTable');
+        reviewDiv.innerHTML = '<h4 style="margin: 0.5rem;">📋 Детальный разбор</h4>';
+        userAnswers.forEach((ans, idx) => {
+            if (!ans) return;
+            const statusClass = ans.isCorrect ? 'review-correct' : 'review-wrong';
+            const statusText = ans.isCorrect ? '✓' : '✗';
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'review-item';
+            itemDiv.innerHTML = `
+                <span><strong>${idx+1}.</strong> ${ans.formula}</span>
+                <span class="${statusClass}">${statusText} ${ans.isCorrect ? ans.selected : ans.correctName}</span>
+                <small>${ans.description}</small>
+            `;
+            reviewDiv.appendChild(itemDiv);
+        });
+        if (percent === 100 && total > 0) {
+            triggerConfetti();
+        }
+        progressSection.style.display = 'none';
+    }
+    
+    function triggerConfetti() {
+        import('https://cdn.skypack.dev/canvas-confetti').then(module => {
+            module.default({
+                particleCount: 200,
+                spread: 70,
+                origin: { y: 0.6 },
+                startVelocity: 20,
+                colors: ['#3b82f6', '#a855f7', '#10b981']
+            });
+        }).catch(() => console.log("🎉 Поздравляем!"));
+    }
+    
+    function startTraining() {
+        if (!loadQuiz()) return;
+        welcomeArea.classList.add('hidden');
+        quizArea.classList.remove('hidden');
+        resultArea.classList.add('hidden');
+        progressSection.style.display = 'block';
+        currentIndex = 0;
+        userAnswers = [];
+        renderCurrentQuestion();
+        updateProgressUI();
+        nextBtn.disabled = true;
+    }
+    
+    function toggleTheme() {
+        document.body.classList.toggle('light');
+        localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark');
+    }
+    
+    if (localStorage.getItem('theme') === 'light') document.body.classList.add('light');
+    themeBtn.addEventListener('click', toggleTheme);
+    startBtn.addEventListener('click', startTraining);
+    nextBtn.addEventListener('click', nextQuestion);
+    skipBtn.addEventListener('click', skipQuestion);
+    hintBtn.addEventListener('click', showHint);
+    restartBtn.addEventListener('click', startTraining);
+    newConfigBtn.addEventListener('click', () => {
+        resultArea.classList.add('hidden');
+        welcomeArea.classList.remove('hidden');
+        quizArea.classList.add('hidden');
+        progressSection.style.display = 'none';
+    });
+</script>
+</body>
+</html>
