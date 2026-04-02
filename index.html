@@ -384,8 +384,8 @@
                     <div style="font-size: 4rem;">🧪✨</div>
                     <h2>Готов проверить знания формул?</h2>
                     <p>Выбери параметры и нажми «Начать тренировку». Тебе покажут формулу — нужно выбрать её правильное название.</p>
-                    <div<h2>ПРИМЕЧАНИЕ</h2> </div>
-                    <div<p>"^" - степень; "S_ab" - где "ab" - подстрочные символы</p></div>
+                     <strong>📌 ПРИМЕЧАНИЕ:</strong>
+                    <div<p> "^" - степень; "S_ab" - где "ab" - подстрочные символы</p></div>
                    <div<p>В 10 классе уровня "легкий" не существует, в 11 классе есть только уровень "сложный" </p></div>
                     <div style="background: var(--option-bg); border-radius: 1rem; padding: 1rem; margin-top: 1.5rem;">
                         <strong>Пример:</strong>
@@ -583,13 +583,28 @@
         { subject: 'geometry', class: 10, difficulty: 'hard', formula: 'V = ⅓ πR²h', name: 'Объём конуса', description: 'Стереометрия' },
         { subject: 'geometry', class: 10, difficulty: 'hard', formula: 'S_бок = πl(R+r)', name: 'Площадь боковой поверхности усечённого конуса', description: 'Стереометрия' },
         { subject: 'geometry', class: 10, difficulty: 'hard', formula: 'V = ⅓ πh (R²+Rr+r²)', name: 'Объём усечённого конуса', description: 'Стереометрия' },
-        { subject: 'geometry', class: 10, difficulty: 'hard', formula: 'S_сферы = 4πR²', name: 'Площадь поверхности сферы', description: 'Стереометрия' },
-        { subject: 'geometry', class: 10, difficulty: 'hard', formula: 'V_шара = ⁴⁄₃ πR³', name: 'Объём шара', description: 'Стереометрия' },
+        { subject: 'geometry', class: 10, difficulty: 'hard', formula: 'S = 4πR²', name: 'Площадь поверхности сферы', description: 'Стереометрия' },
+        { subject: 'geometry', class: 10, difficulty: 'hard', formula: 'V = ⁴⁄₃ πR³', name: 'Объём шара', description: 'Стереометрия' },
         { subject: 'geometry', class: 10, difficulty: 'hard', formula: 'd = √((x₂-x₁)²+(y₂-y₁)²+(z₂-z₁)²)', name: 'Расстояние между точками в пространстве', description: 'Координаты' },
         { subject: 'geometry', class: 10, difficulty: 'hard', formula: 'a·b = x₁x₂+y₁y₂+z₁z₂', name: 'Скалярное произведение в пространстве', description: 'Векторы' },
         { subject: 'geometry', class: 10, difficulty: 'hard', formula: 'cosφ = (a·b)/(|a||b|)', name: 'Угол между векторами', description: 'Скалярное произведение' }
+        { subject: 'geometry', class: 11, difficulty: 'hard', formula: 'x = x₀ + lt, y = y₀ + mt, z = z₀ + nt', name: 'Параметрическое уравнение прямой', description: 'Аналитическая геометрия' },
+        { subject: 'geometry', class: 11, difficulty: 'hard', formula: 'A(x - x₀) + B(y - y₀) + C(z - z₀) = 0', name: 'Уравнение плоскости по точке и нормали', description: 'Аналитическая геометрия' },
+        { subject: 'geometry', class: 11, difficulty: 'hard', formula: 'x/a + y/b + z/c = 1', name: 'Уравнение плоскости в отрезках', description: 'Аналитическая геометрия' },
+        { subject: 'geometry', class: 11, difficulty: 'hard', formula: '(x - x₀)² + (y - y₀)² + (z - z₀)² = R²', name: 'Уравнение сферы', description: 'Аналитическая геометрия' },
+        { subject: 'geometry', class: 11, difficulty: 'hard', formula: 'V = πh²(R - h/3)', name: 'Объём шарового сегмента', description: 'Стереометрия' },
+        { subject: 'geometry', class: 11, difficulty: 'hard', formula: 'S= 2πRh', name: 'Площадь сферического сегмента', description: 'Стереометрия' },
+        { subject: 'geometry', class: 11, difficulty: 'hard', formula: 'V = ⅓πh(3R₁²+3R₂²+h²)', name: 'Объём шарового слоя', description: 'Стереометрия' },
+        { subject: 'geometry', class: 11, difficulty: 'hard', formula: 'V = a³√2 / 12', name: 'Объём правильного тетраэдра', description: 'Стереометрия' },
+        { subject: 'geometry', class: 11, difficulty: 'hard', formula: 'S= a²√3', name: 'Площадь поверхности правильного тетраэдра', description: 'Стереометрия' },
+        { subject: 'geometry', class: 11, difficulty: 'hard', formula: 'V= a³√2 / 3', name: 'Объём правильного октаэдра', description: 'Стереометрия' },
+        { subject: 'geometry', class: 11, difficulty: 'hard', formula: 'S= 2a²√3', name: 'Площадь поверхности правильного октаэдра', description: 'Стереометрия' },
+        { subject: 'geometry', class: 11, difficulty: 'hard', formula: 'S= 2πRh', name: 'Площадь шарового пояса', description: 'Стереометрия' },
+        { subject: 'geometry', class: 11, difficulty: 'hard', formula: 'G = ((x₁+x₂+x₃+x₄)/4, ...)', name: 'Центроид тетраэдра (координаты)', description: 'Координаты' },
+        { subject: 'geometry', class: 11, difficulty: 'hard', formula: 'r = 3V / S_полн', name: 'Радиус вписанной сферы в многогранник', description: 'Стереометрия' },
+        { subject: 'geometry', class: 11, difficulty: 'hard', formula: 'R = abc / (4V)', name: 'Радиус описанной сферы около тетраэдра', description: 'Стереометрия' }
     ];
-
+  
     // Убираем возможные дубликаты по имени и формуле (простая проверка)
     const uniqueFormulas = [];
     const seen = new Set();
